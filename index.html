@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Todo Plan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 主界面 Today -->
+        <div id="main-screen" class="screen active">
+            <h1 class="screen-title">Today</h1>
+            <div class="action-buttons">
+                <button class="btn" onclick="showScreen('todo-screen')">CREATE TODAY'S TODO LIST</button>
+                <button class="btn" onclick="showScreen('past-screen')">VIEW PAST LIST</button>
+                <button class="btn" onclick="showScreen('record-screen')">SELF RECORDING</button>
+            </div>
+        </div>
+
+        <!-- 界面1：今日待办 -->
+        <div id="todo-screen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('main-screen')">← Back</button>
+                <button class="add-sticker-btn" onclick="openStickerPanel()">+</button>
+            </div>
+            <div id="todo-items" class="todo-items">
+                <!-- 动态生成待办项 -->
+            </div>
+            <div id="sticker-panel" class="sticker-panel hidden">
+                <div class="sticker-library" id="sticker-library">
+                    <!-- 动态加载贴纸 -->
+                </div>
+                <button class="upload-sticker-btn" onclick="uploadSticker()">+ Upload Sticker</button>
+            </div>
+            <div id="sticker-canvas" class="sticker-canvas"></div>
+        </div>
+
+        <!-- 界面2：历史列表 -->
+        <div id="past-screen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('main-screen')">← Back</button>
+                <h2 class="screen-title">Past Lists</h2>
+            </div>
+            <div id="past-lists" class="past-lists">
+                <!-- 动态加载历史记录 -->
+            </div>
+        </div>
+
+        <!-- 界面3：自我记录 -->
+        <div id="record-screen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('main-screen')">← Back</button>
+                <h2 class="screen-title" id="completion-title">Completion Rate: 0% <span id="emoji-container"></span></h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="completion-chart"></canvas>
+            </div>
+            <div class="chart-controls">
+                <button class="btn" onclick="toggleChartView('month')">View Month</button>
+                <button class="btn" onclick="toggleChartView('all')">View All Time</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
