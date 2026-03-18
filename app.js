@@ -1,43 +1,33 @@
 // 全局状态
 let currentUserIP = '';
 let todoData = {};
-// 个人本地贴纸库（按IP隔离）
 let personalStickers = {};
-// 公共全局贴纸库（自动从仓库加载）
 let globalStickers = [];
 let customEmojis = { low: '', medium: '', high: '' };
 let currentChartView = 'month';
 
-// 初始化：获取用户IP并加载所有数据
+// 初始化
 async function init() {
     try {
         const res = await fetch('https://api.ipify.org?format=json');
         const data = await res.json();
         currentUserIP = data.ip;
     } catch (err) {
-        console.error('Failed to get IP:', err);
         currentUserIP = 'default-user';
     }
-    await loadGlobalStickers(); // 先加载公共贴纸
+    await loadGlobalStickers();
     loadUserData();
     loadPersonalStickers();
     loadCustomEmojis();
 }
 
-// 自动加载仓库 /stickers/ 下的所有公共贴纸
+// 加载公共贴纸
 async function loadGlobalStickers() {
     try {
-        const res = await fetch(
-            "https://api.github.com/repos/Jennyyyying/SelfDailyPan/contents/stickers"
-        );
+        const res = await fetch("https://api.github.com/repos/Jennyyyying/SelfDailyPan/contents/stickers");
         const files = await res.json();
-        // 过滤图片文件并生成可访问URL
         globalStickers = files
-            .filter(file => 
-                file.name.endsWith(".png") || 
-                file.name.endsWith(".jpg") || 
-                file.name.endsWith(".jpeg")
-            )
+            .filter(file => file.name.endsWith(".png") || file.name.endsWith(".jpg") || file.name.endsWith(".jpeg"))
             .map(file => file.download_url);
     } catch (err) {
         console.error("加载公共贴纸失败:", err);
@@ -45,18 +35,10 @@ async function loadGlobalStickers() {
     }
 }
 
-// 加载用户数据（基于IP）
+// 加载用户数据
 function loadUserData() {
     const saved = localStorage.getItem(`todo-data-${currentUserIP}`);
-    if (saved) {
-        todoData = JSON.parse(saved);
-    } else {
-        todoData = {
-            today: [],
-            past: [],
-            completionHistory: []
-        };
-    }
+    todoData = saved ? JSON.parse(saved) : { today: [], past: [], completionHistory: [] };
 }
 
 // 保存用户数据
@@ -67,11 +49,7 @@ function saveUserData() {
 // 加载个人贴纸
 function loadPersonalStickers() {
     const saved = localStorage.getItem(`personal-stickers-${currentUserIP}`);
-    if (saved) {
-        personalStickers = JSON.parse(saved);
-    } else {
-        personalStickers = { stickers: [] };
-    }
+    personalStickers = saved ? JSON.parse(saved) : { stickers: [] };
 }
 
 // 保存个人贴纸
@@ -85,8 +63,8 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
     if (screenId === 'todo-screen') {
         renderTodoItems();
-        openStickerPanel(); // 打开贴纸面板
-        openStickerPanel(); // 关闭贴纸面板（重置状态）
+        openStickerPanel();
+        openStickerPanel();
     }
     if (screenId === 'past-screen') renderPastLists();
     if (screenId === 'record-screen') renderCompletionChart();
@@ -106,25 +84,21 @@ function renderTodoItems() {
     }
 }
 
-// 创建待办项元素
+// ✅ 修复重复变量：这里参数是 item，内部变量改为 itemEl
 function createTodoItemElement(item) {
     const itemEl = document.createElement('div');
-    itemEL.className = 'todo-item';
-    const checkboxClass = itemEl.status === 'partial' ? 'partial' : itemEl.status === 'complete' ? 'complete' : '';
+    itemEl.className = 'todo-item';
+    const checkboxClass = item.status === 'partial' ? 'partial' : item.status === 'complete' ? 'complete' : '';
     itemEl.innerHTML = `
-        <div class="todo-checkbox ${checkboxClass}" onclick="toggleTodoStatus(this, ${itemEl.id})"></div>
-        <input type="text" class="todo-input" value="${itemEl.text}" placeholder="XXX" onchange="updateTodoText(${itemEl.id}, this.value)" onkeydown="handleTodoInput(event, ${item.id})">
+        <div class="todo-checkbox ${checkboxClass}" onclick="toggleTodoStatus(this, ${item.id})"></div>
+        <input type="text" class="todo-input" value="${item.text}" placeholder="XXX" onchange="updateTodoText(${item.id}, this.value)" onkeydown="handleTodoInput(event, ${item.id})">
     `;
     return itemEl;
 }
 
 // 添加待办项
 function addTodoItem(text = '') {
-    const newItem = {
-        id: Date.now(),
-        text: text,
-        status: '' // ''=未开始, 'partial'=半完成, 'complete'=已完成
-    };
+    const newItem = { id: Date.now(), text: text, status: '' };
     todoData.today.push(newItem);
     saveUserData();
     renderTodoItems();
@@ -157,7 +131,7 @@ function updateTodoText(id, text) {
     }
 }
 
-// 处理回车新增待办
+// 回车新增待办
 function handleTodoInput(e, id) {
     if (e.key === 'Enter') {
         e.preventDefault();
@@ -169,17 +143,13 @@ function handleTodoInput(e, id) {
 function openStickerPanel() {
     const panel = document.getElementById('sticker-panel');
     panel.classList.toggle('hidden');
-    if (!panel.classList.contains('hidden')) {
-        renderStickerLibrary();
-    }
+    if (!panel.classList.contains('hidden')) renderStickerLibrary();
 }
 
-// 渲染贴纸面板（公共+个人）
+// 渲染贴纸库
 function renderStickerLibrary() {
     const library = document.getElementById('sticker-library');
     library.innerHTML = '';
-    
-    // 公共贴纸区
     if (globalStickers.length > 0) {
         library.innerHTML += '<h4>公共贴纸</h4>';
         globalStickers.forEach((sticker, idx) => {
@@ -193,8 +163,6 @@ function renderStickerLibrary() {
             library.appendChild(img);
         });
     }
-
-    // 个人贴纸区
     library.innerHTML += '<h4>我的贴纸</h4>';
     if (personalStickers.stickers.length === 0) {
         library.innerHTML += '<p style="font-size:12px;color:#666;">暂无贴纸，点击下方按钮上传</p>';
@@ -212,7 +180,7 @@ function renderStickerLibrary() {
     }
 }
 
-// 拖拽开始事件
+// 拖拽事件
 function handleDragStart(e) {
     e.dataTransfer.setData('text/plain', JSON.stringify({
         type: e.target.dataset.type,
@@ -306,61 +274,25 @@ function confirmDeletePastList(date) {
 function renderCompletionChart() {
     const canvas = document.getElementById('completion-chart');
     const ctx = canvas.getContext('2d');
-    // 这里简化实现，实际可使用Chart.js等库完善图表
     const completionRate = calculateOverallCompletionRate();
     document.getElementById('completion-title').textContent = `Completion Rate: ${completionRate}%`;
     const emojiContainer = document.getElementById('emoji-container');
     emojiContainer.innerHTML = '';
     if (completionRate < 40) {
-        if (customEmojis.low) {
-            const img = document.createElement('img');
-            img.src = customEmojis.low;
-            img.style.width = '24px';
-            img.style.height = '24px';
-            emojiContainer.appendChild(img);
-        } else {
-            emojiContainer.textContent = '😞';
-        }
+        emojiContainer.innerHTML = customEmojis.low ? `<img src="${customEmojis.low}" style="width:24px;height:24px;">` : '😞';
     } else if (completionRate < 80) {
-        if (customEmojis.medium) {
-            const img = document.createElement('img');
-            img.src = customEmojis.medium;
-            img.style.width = '24px';
-            img.style.height = '24px';
-            emojiContainer.appendChild(img);
-        } else {
-            emojiContainer.textContent = '😊';
-        }
+        emojiContainer.innerHTML = customEmojis.medium ? `<img src="${customEmojis.medium}" style="width:24px;height:24px;">` : '😐';
     } else {
-        if (customEmojis.high) {
-            const img = document.createElement('img');
-            img.src = customEmojis.high;
-            img.style.width = '24px';
-            img.style.height = '24px';
-            emojiContainer.appendChild(img);
-        } else {
-            emojiContainer.textContent = '😄';
-        }
+        emojiContainer.innerHTML = customEmojis.high ? `<img src="${customEmojis.high}" style="width:24px;height:24px;">` : '😄';
     }
 }
 
 // 计算总体完成度
 function calculateOverallCompletionRate() {
     if (todoData.past.length === 0 && todoData.today.length === 0) return 0;
-    let total = 0;
-    let completed = 0;
-    // 统计今日待办
-    todoData.today.forEach(item => {
-        total++;
-        if (item.status === 'complete') completed++;
-    });
-    // 统计历史待办
-    todoData.past.forEach(list => {
-        list.items.forEach(item => {
-            total++;
-            if (item.status === 'complete') completed++;
-        });
-    });
+    let total = 0, completed = 0;
+    todoData.today.forEach(item => { total++; if (item.status === 'complete') completed++; });
+    todoData.past.forEach(list => { list.items.forEach(item => { total++; if (item.status === 'complete') completed++; }); });
     return total === 0 ? 0 : Math.round((completed / total) * 100);
 }
 
@@ -370,5 +302,5 @@ function toggleChartView(view) {
     renderCompletionChart();
 }
 
-// 初始化执行
+// 启动
 init();
