@@ -108,14 +108,14 @@ function renderTodoItems() {
 
 // 创建待办项元素
 function createTodoItemElement(item) {
-    const item = document.createElement('div');
-    item.className = 'todo-item';
-    const checkboxClass = item.status === 'partial' ? 'partial' : item.status === 'complete' ? 'complete' : '';
-    item.innerHTML = `
-        <div class="todo-checkbox ${checkboxClass}" onclick="toggleTodoStatus(this, ${item.id})"></div>
-        <input type="text" class="todo-input" value="${item.text}" placeholder="XXX" onchange="updateTodoText(${item.id}, this.value)" onkeydown="handleTodoInput(event, ${item.id})">
+    const itemEl = document.createElement('div');
+    itemEL.className = 'todo-item';
+    const checkboxClass = itemEl.status === 'partial' ? 'partial' : itemEl.status === 'complete' ? 'complete' : '';
+    itemEl.innerHTML = `
+        <div class="todo-checkbox ${checkboxClass}" onclick="toggleTodoStatus(this, ${itemEl.id})"></div>
+        <input type="text" class="todo-input" value="${itemEl.text}" placeholder="XXX" onchange="updateTodoText(${itemEl.id}, this.value)" onkeydown="handleTodoInput(event, ${item.id})">
     `;
-    return item;
+    return itemEl;
 }
 
 // 添加待办项
