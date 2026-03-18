@@ -1,119 +1,75 @@
-// 全局状态
+// 全局状态：拆分贴纸库
 let currentUserIP = '';
 let todoData = {};
-let stickerLibrary = [];
-let customEmojis = {
-    low: '',
-    medium: '',
-    high: ''
-};
+// 个人本地贴纸库（按IP隔离）
+let personalStickers = {};
+// 公共全局贴纸库（管理员添加，所有用户可见）
+const globalStickers = [
+    // 这里放你上传的公共贴纸URL，示例：
+    // "https://your-domain.com/stickers/star.png",
+    // "https://your-domain.com/stickers/heart.png"
+];
+let customEmojis = { low: '', medium: '', high: '' };
 
-// 初始化：获取用户IP并加载数据
-async function init() {
-    try {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const data = await res.json();
-        currentUserIP = data.ip;
-        loadUserData();
-        loadStickerLibrary();
-        loadCustomEmojis();
-    } catch (err) {
-        console.error('Failed to get IP:', err);
-        currentUserIP = 'default-user';
-        loadUserData();
-    }
-}
-
-// 加载用户数据（基于IP）
-function loadUserData() {
-    const saved = localStorage.getItem(`todo-data-${currentUserIP}`);
+// 初始化加载个人贴纸
+function loadPersonalStickers() {
+    const saved = localStorage.getItem(`personal-stickers-${currentUserIP}`);
     if (saved) {
-        todoData = JSON.parse(saved);
+        personalStickers = JSON.parse(saved);
     } else {
-        todoData = {
-            today: [],
-            past: [],
-            completionHistory: []
-        };
+        personalStickers = { stickers: [] };
     }
 }
 
-// 保存用户数据
-function saveUserData() {
-    localStorage.setItem(`todo-data-${currentUserIP}`, JSON.stringify(todoData));
+// 保存个人贴纸
+function savePersonalStickers() {
+    localStorage.setItem(`personal-stickers-${currentUserIP}`, JSON.stringify(personalStickers));
 }
 
-// 切换界面
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-    if (screenId === 'past-screen') renderPastLists();
-    if (screenId === 'record-screen') renderCompletionChart();
-}
-
-// 待办项交互
-function addTodoItem(text = '') {
-    const todoItems = document.getElementById('todo-items');
-    const item = document.createElement('div');
-    item.className = 'todo-item';
-    item.innerHTML = `
-        <div class="todo-checkbox" onclick="toggleTodoStatus(this)"></div>
-        <input type="text" class="todo-input" value="${text}" placeholder="XXX" onkeydown="handleTodoInput(event)">
-    `;
-    todoItems.appendChild(item);
-}
-
-function toggleTodoStatus(checkbox) {
-    if (checkbox.classList.contains('partial')) {
-        checkbox.classList.remove('partial');
-        checkbox.classList.add('complete');
-    } else if (checkbox.classList.contains('complete')) {
-        checkbox.classList.remove('complete');
-    } else {
-        checkbox.classList.add('partial');
-    }
-}
-
-function handleTodoInput(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        addTodoItem();
-    }
-}
-
-// 贴纸功能
-function openStickerPanel() {
-    document.getElementById('sticker-panel').classList.toggle('hidden');
-    renderStickerLibrary();
-}
-
+// 渲染贴纸面板（合并公共+个人）
 function renderStickerLibrary() {
     const library = document.getElementById('sticker-library');
     library.innerHTML = '';
-    stickerLibrary.forEach((sticker, idx) => {
+    
+    // 先渲染公共贴纸
+    library.innerHTML += '<h4>公共贴纸</h4>';
+    globalStickers.forEach((sticker, idx) => {
         const img = document.createElement('img');
         img.src = sticker;
         img.className = 'sticker-thumbnail';
         img.draggable = true;
+        img.dataset.type = 'global';
         img.dataset.index = idx;
-        img.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', idx);
-        });
+        img.addEventListener('dragstart', handleDragStart);
+        library.appendChild(img);
+    });
+
+    // 再渲染个人贴纸
+    library.innerHTML += '<h4>我的贴纸</h4>';
+    personalStickers.stickers.forEach((sticker, idx) => {
+        const img = document.createElement('img');
+        img.src = sticker;
+        img.className = 'sticker-thumbnail';
+        img.draggable = true;
+        img.dataset.type = 'personal';
+        img.dataset.index = idx;
+        img.addEventListener('dragstart', handleDragStart);
         library.appendChild(img);
     });
 }
 
-function uploadSticker() {
+// 上传个人贴纸（所有用户可操作）
+function uploadPersonalSticker() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*';
+    input.accept = 'image/*'; // 支持png/jpg等格式
     input.onchange = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (ev) => {
-                stickerLibrary.push(ev.target.result);
-                saveStickerLibrary();
+                personalStickers.stickers.push(ev.target.result);
+                savePersonalStickers();
                 renderStickerLibrary();
             };
             reader.readAsDataURL(file);
@@ -122,42 +78,10 @@ function uploadSticker() {
     input.click();
 }
 
-function saveStickerLibrary() {
-    localStorage.setItem('sticker-library', JSON.stringify(stickerLibrary));
+// 拖拽事件处理
+function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+        type: e.target.dataset.type,
+        index: e.target.dataset.index
+    }));
 }
-
-function loadStickerLibrary() {
-    const saved = localStorage.getItem('sticker-library');
-    if (saved) stickerLibrary = JSON.parse(saved);
-}
-
-// 自定义表情上传
-function uploadEmoji(type) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                customEmojis[type] = ev.target.result;
-                saveCustomEmojis();
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    input.click();
-}
-
-function saveCustomEmojis() {
-    localStorage.setItem('custom-emojis', JSON.stringify(customEmojis));
-}
-
-function loadCustomEmojis() {
-    const saved = localStorage.getItem('custom-emojis');
-    if (saved) customEmojis = JSON.parse(saved);
-}
-
-// 初始化执行
-init();
