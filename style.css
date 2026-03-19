@@ -7,9 +7,19 @@ body {
 .screen {
     display: none;
 }
-
 .active {
     display: block;
+}
+
+/* 按钮统一风格 */
+.btn {
+    background: #dbeafe;
+    color: #9ca3af;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 /* 首页 */
@@ -28,20 +38,29 @@ body {
     align-items: center;
 }
 
-.menu button {
+.menu .btn {
     width: 260px;
     margin: 10px;
-    padding: 14px;
-    background: #dbeafe;
-    border: none;
-    color: #777;
 }
 
-/* 通用 */
+/* 位置 */
 .back {
     position: fixed;
-    left: 10px;
-    top: 10px;
+    left: 12px;
+    top: 12px;
+}
+
+.sticker-btn {
+    position: fixed;
+    right: 12px;
+    top: 12px;
+}
+
+/* Save按钮 */
+.save-btn {
+    position: fixed;
+    right: 40px;
+    bottom: 40px;
 }
 
 /* TODO */
@@ -57,8 +76,8 @@ body {
 }
 
 .box {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border: 1px solid black;
     margin-right: 10px;
 }
@@ -91,6 +110,7 @@ body {
     width: 70px;
 }
 
+/* 面板 */
 #sticker-panel {
     position: fixed;
     right: 20px;
