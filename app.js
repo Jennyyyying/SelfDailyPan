@@ -1,161 +1,153 @@
-function showPage(page) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(page).classList.add("active");
+let data = JSON.parse(localStorage.getItem("data") || "{}");
+let stickers = [];
 
-  if (page === "todo") {
-    document.getElementById("today-date").innerText = getToday();
-  }
+function show(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
 
-  if (page === "history") loadHistory();
-  if (page === "stats") loadStats();
-}
-
-function getToday() {
-  return new Date().toISOString().split("T")[0];
+    if (id === "todo") initTodo();
+    if (id === "past") renderPast();
+    if (id === "record") renderChart();
 }
 
 /* TODO */
 
-function addTodo(text = "", state = 0) {
-  let div = document.createElement("div");
-  div.className = "todo-item";
+function initTodo() {
+    let area = document.getElementById("todo-area");
+    area.innerHTML = "";
 
-  let box = document.createElement("div");
-  box.className = "checkbox";
+    let today = getToday();
+    if (!data[today]) data[today] = [];
 
-  let txt = document.createElement("div");
-  txt.contentEditable = true;
-  txt.innerText = text;
+    if (data[today].length === 0) addLine();
 
-  let clickCount = 0;
-
-  box.onclick = () => {
-    clickCount++;
-    if (clickCount === 1) {
-      setTimeout(() => {
-        if (clickCount === 1) {
-          box.className = "checkbox half";
-        } else {
-          box.className = "checkbox full";
-        }
-        clickCount = 0;
-      }, 200);
-    }
-  };
-
-  div.appendChild(box);
-  div.appendChild(txt);
-
-  document.getElementById("todo-list").appendChild(div);
+    data[today].forEach(item => createLine(item));
 }
 
-/* 保存 */
+function createLine(item) {
+    let area = document.getElementById("todo-area");
 
-function saveToday() {
-  let items = [];
-
-  document.querySelectorAll(".todo-item").forEach(item => {
-    let text = item.children[1].innerText;
-    let box = item.children[0];
-
-    let state = 0;
-    if (box.classList.contains("half")) state = 1;
-    if (box.classList.contains("full")) state = 2;
-
-    items.push({ text, state });
-  });
-
-  let data = JSON.parse(localStorage.getItem("data") || "{}");
-  data[getToday()] = { todos: items };
-
-  localStorage.setItem("data", JSON.stringify(data));
-  alert("Saved!");
-}
-
-/* 历史 */
-
-function loadHistory() {
-  let data = JSON.parse(localStorage.getItem("data") || "{}");
-  let container = document.getElementById("history-list");
-  container.innerHTML = "";
-
-  Object.keys(data).forEach(date => {
     let div = document.createElement("div");
-    div.innerText = date;
+    div.className = "todo-line";
 
-    let del = document.createElement("button");
-    del.innerText = "🗑";
-    del.onclick = () => {
-      if (confirm("Delete?")) {
-        delete data[date];
-        localStorage.setItem("data", JSON.stringify(data));
-        loadHistory();
-      }
+    let box = document.createElement("div");
+    box.className = "box " + item.state;
+
+    let clickTimer;
+
+    box.onclick = () => {
+        if (clickTimer) {
+            clearTimeout(clickTimer);
+            item.state = "full";
+        } else {
+            clickTimer = setTimeout(() => {
+                item.state = "partial";
+                clickTimer = null;
+                save();
+                initTodo();
+            }, 200);
+        }
+        save();
+        initTodo();
     };
 
-    div.appendChild(del);
-    container.appendChild(div);
-  });
+    let input = document.createElement("input");
+    input.className = "input";
+    input.value = item.text;
+
+    input.oninput = () => {
+        item.text = input.value;
+        save();
+    };
+
+    input.onkeydown = e => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            addLine();
+        }
+    };
+
+    div.appendChild(box);
+    div.appendChild(input);
+    area.appendChild(div);
+
+    setTimeout(() => input.focus(), 0);
 }
 
-/* 统计 */
+function addLine() {
+    let today = getToday();
+    data[today].push({ text: "", state: "" });
+    save();
+    initTodo();
+}
+
+function save() {
+    localStorage.setItem("data", JSON.stringify(data));
+}
+
+function getToday() {
+    return new Date().toISOString().split("T")[0];
+}
+
+/* Past */
+
+function renderPast() {
+    let box = document.getElementById("past-content");
+    box.innerHTML = "";
+
+    let keys = Object.keys(data);
+
+    if (keys.length === 0) {
+        box.innerHTML = `
+            <div style="color:gray">
+            Let's start our day.
+            <button onclick="show('todo')">＋</button>
+            </div>
+        `;
+        return;
+    }
+
+    keys.forEach(k => {
+        let div = document.createElement("div");
+        div.innerText = k;
+        box.appendChild(div);
+    });
+}
+
+/* Chart */
 
 let chart;
 
-function loadStats() {
-  let data = JSON.parse(localStorage.getItem("data") || "{}");
+function renderChart() {
+    let keys = Object.keys(data);
+    let rates = [];
 
-  let dates = [];
-  let rates = [];
+    keys.forEach(k => {
+        let list = data[k];
+        let done = list.filter(i => i.state === "full").length;
+        let r = list.length ? done / list.length * 100 : 0;
+        rates.push(r);
+    });
 
-  Object.keys(data).forEach(date => {
-    let todos = data[date].todos;
-    let done = todos.filter(t => t.state === 2).length;
-    let rate = todos.length ? done / todos.length : 0;
+    let noData = document.getElementById("no-data");
 
-    dates.push(date);
-    rates.push(rate * 100);
-  });
+    if (keys.length === 0) {
+        noData.style.display = "block";
+        return;
+    }
 
-  let noData = document.getElementById("no-data");
+    noData.style.display = "none";
 
-  if (dates.length === 0) {
-    noData.style.display = "block";
+    let avg = rates.reduce((a,b)=>a+b,0)/rates.length;
+    document.getElementById("big-rate").innerText = avg.toFixed(0) + "%";
 
     if (chart) chart.destroy();
 
     chart = new Chart(document.getElementById("chart"), {
-      type: "line",
-      data: {
-        labels: [" ", " ", " "],
-        datasets: [{ data: [0, 0, 0] }]
-      },
-      options: {
-        scales: {
-          x: { display: true },
-          y: { display: true }
+        type: "line",
+        data: {
+            labels: keys,
+            datasets: [{ data: rates }]
         }
-      }
     });
-
-    return;
-  }
-
-  noData.style.display = "none";
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("chart"), {
-    type: "line",
-    data: {
-      labels: dates,
-      datasets: [{
-        label: "Completion %",
-        data: rates
-      }]
-    }
-  });
-
-  let avg = rates.reduce((a, b) => a + b, 0) / rates.length;
-  document.getElementById("rate-title").innerText = avg.toFixed(1) + "%";
 }
