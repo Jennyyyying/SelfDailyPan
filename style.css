@@ -1,91 +1,141 @@
 body {
-  margin: 0;
-  font-family: Arial;
-  background: white;
-  color: black;
+    margin: 0;
+    font-family: Arial;
+    background: white;
 }
 
-/* 页面切换 */
-.page {
-  display: none;
-  padding: 20px;
+.screen {
+    display: none;
 }
 
 .active {
-  display: block;
+    display: block;
 }
 
-/* 主页面 */
+/* 首页 */
 .main-title {
-  height: 33vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 60px;
-  font-weight: bold;
+    height: 33vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 70px;
+    font-weight: bold;
 }
 
 .menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .menu button {
-  width: 260px;
-  padding: 15px;
-  margin: 10px;
-  background: #dbeafe; /* 浅蓝 */
-  border: none;
-  color: gray;
-  font-size: 14px;
-  cursor: pointer;
+    width: 260px;
+    margin: 10px;
+    padding: 14px;
+    background: #dbeafe;
+    border: none;
+    color: #777;
 }
 
-/* back按钮 */
+/* 通用 */
 .back {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+    position: fixed;
+    left: 10px;
+    top: 10px;
 }
 
 /* TODO */
-.todo-item {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
+#todo-area {
+    margin-left: 33%;
+    margin-top: 80px;
 }
 
-.checkbox {
-  width: 20px;
-  height: 20px;
-  border: 2px solid black;
-  margin-right: 10px;
+.todo-line {
+    display: flex;
+    margin: 12px 0;
+    font-size: 22px;
 }
 
-.half {
-  background: linear-gradient(to top, lightblue 50%, white 50%);
+.box {
+    width: 20px;
+    height: 20px;
+    border: 1px solid black;
+    margin-right: 10px;
+}
+
+.partial {
+    background: linear-gradient(to top, #a0c4ff 50%, white 50%);
 }
 
 .full {
-  background: lightblue;
+    background: #a0c4ff;
 }
 
-[contenteditable] {
-  outline: none;
+.input {
+    border: none;
+    font-size: 22px;
+    outline: none;
 }
 
-/* 图表 */
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 300px;
+/* 贴纸 */
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.sticker {
+    position: absolute;
+    width: 70px;
+}
+
+#sticker-panel {
+    position: fixed;
+    right: 20px;
+    top: 80px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Past */
+#past-content {
+    margin-left: 33%;
+    margin-top: 80px;
+    font-size: 22px;
+}
+
+/* Record */
+.big-rate {
+    height: 33vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 80px;
+}
+
+.small-title {
+    margin-left: 33%;
+    color: gray;
+}
+
+.chart-box {
+    width: 33%;
+    height: 33vh;
+    margin: auto;
+    position: relative;
 }
 
 #no-data {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: gray;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    color: gray;
 }
