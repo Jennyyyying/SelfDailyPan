@@ -11,53 +11,67 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
 }
 
 .screen {
     display: none;
+    min-height: 90vh;
 }
 
 .screen.active {
     display: block;
 }
 
+/* 主界面布局优化 */
+.main-header {
+    height: 33vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .screen-title {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: bold;
-    margin-bottom: 20px;
+    text-align: center;
 }
 
 .action-buttons {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    align-items: center;
+    margin-top: 20px;
 }
 
 .btn {
-    padding: 12px 20px;
+    padding: 12px 30px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     text-align: left;
+    width: 320px; /* 缩短按钮长度 */
 }
 
 .btn:hover {
     background-color: #e0e0e0;
 }
 
-.header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+/* 待办界面布局 */
+.todo-header {
+    position: relative;
     margin-bottom: 20px;
 }
 
 .back-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
     padding: 8px 12px;
     background: none;
     border: none;
@@ -65,8 +79,27 @@ body {
     cursor: pointer;
 }
 
+.add-sticker-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px 14px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.todo-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px; /* 给返回键留出空间 */
+}
+
 .todo-items {
-    margin-bottom: 20px;
+    width: 60%;
+    margin: 0 auto;
 }
 
 .todo-item {
@@ -96,13 +129,15 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
+    padding: 4px;
 }
 
+/* 贴纸面板样式 */
 .sticker-panel {
     position: absolute;
     top: 60px;
     right: 20px;
-    width: 200px;
+    width: 220px;
     background: white;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -112,6 +147,12 @@ body {
 
 .sticker-panel.hidden {
     display: none;
+}
+
+.sticker-library h4 {
+    margin: 10px 0 5px;
+    font-size: 14px;
+    color: #666;
 }
 
 .sticker-library {
@@ -130,19 +171,40 @@ body {
     border-radius: 4px;
 }
 
+.upload-sticker-btn {
+    width: 100%;
+    padding: 8px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
 .sticker-canvas {
     position: relative;
     min-height: 300px;
     border: 1px dashed #ccc;
     padding: 10px;
+    margin-top: 20px;
+    background: #fafafa;
 }
 
 .sticker {
     position: absolute;
     cursor: move;
-    user-select: none;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 80px;
+    height: 80px;
 }
 
+.sticker:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* 历史列表样式 */
 .past-lists .list-item {
     display: flex;
     align-items: center;
@@ -163,19 +225,14 @@ body {
     font-size: 18px;
 }
 
-.confirm-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
+/* 图表样式 */
 .chart-container {
     height: 300px;
     margin: 20px 0;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
