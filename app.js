@@ -1,10 +1,10 @@
-let currentPage = "home";
-let todos = [];
-let stickers = [];
-
 function showPage(page) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(page).classList.add("active");
+
+  if (page === "todo") {
+    document.getElementById("today-date").innerText = getToday();
+  }
 
   if (page === "history") loadHistory();
   if (page === "stats") loadStats();
@@ -43,9 +43,6 @@ function addTodo(text = "", state = 0) {
     }
   };
 
-  if (state === 1) box.classList.add("half");
-  if (state === 2) box.classList.add("full");
-
   div.appendChild(box);
   div.appendChild(txt);
 
@@ -56,6 +53,7 @@ function addTodo(text = "", state = 0) {
 
 function saveToday() {
   let items = [];
+
   document.querySelectorAll(".todo-item").forEach(item => {
     let text = item.children[1].innerText;
     let box = item.children[0];
@@ -68,7 +66,7 @@ function saveToday() {
   });
 
   let data = JSON.parse(localStorage.getItem("data") || "{}");
-  data[getToday()] = { todos: items, stickers };
+  data[getToday()] = { todos: items };
 
   localStorage.setItem("data", JSON.stringify(data));
   alert("Saved!");
@@ -102,6 +100,8 @@ function loadHistory() {
 
 /* 统计 */
 
+let chart;
+
 function loadStats() {
   let data = JSON.parse(localStorage.getItem("data") || "{}");
 
@@ -117,16 +117,35 @@ function loadStats() {
     rates.push(rate * 100);
   });
 
-  let avg = rates.reduce((a, b) => a + b, 0) / (rates.length || 1);
+  let noData = document.getElementById("no-data");
 
-  document.getElementById("rate-title").innerText = avg.toFixed(1) + "%";
+  if (dates.length === 0) {
+    noData.style.display = "block";
 
-  let emoji = document.getElementById("rate-emoji");
-  if (avg < 40) emoji.src = "emoji/low.png";
-  else if (avg < 80) emoji.src = "emoji/mid.png";
-  else emoji.src = "emoji/high.png";
+    if (chart) chart.destroy();
 
-  new Chart(document.getElementById("chart"), {
+    chart = new Chart(document.getElementById("chart"), {
+      type: "line",
+      data: {
+        labels: [" ", " ", " "],
+        datasets: [{ data: [0, 0, 0] }]
+      },
+      options: {
+        scales: {
+          x: { display: true },
+          y: { display: true }
+        }
+      }
+    });
+
+    return;
+  }
+
+  noData.style.display = "none";
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("chart"), {
     type: "line",
     data: {
       labels: dates,
@@ -136,56 +155,7 @@ function loadStats() {
       }]
     }
   });
-}
 
-/* 贴纸 */
-
-function openStickerPanel() {
-  let panel = document.getElementById("sticker-panel");
-  panel.classList.toggle("hidden");
-
-  panel.innerHTML = "";
-
-  for (let i = 1; i <= 10; i++) {
-    let img = document.createElement("img");
-    img.src = "stickers/" + i + ".png";
-    img.width = 50;
-
-    img.onclick = () => addSticker(img.src);
-
-    panel.appendChild(img);
-  }
-}
-
-function addSticker(src) {
-  let img = document.createElement("img");
-  img.src = src;
-  img.className = "sticker";
-
-  img.style.left = "50px";
-  img.style.top = "50px";
-
-  dragElement(img);
-
-  document.getElementById("sticker-layer").appendChild(img);
-}
-
-/* 拖拽 */
-
-function dragElement(el) {
-  let offsetX, offsetY;
-
-  el.onmousedown = e => {
-    offsetX = e.offsetX;
-    offsetY = e.offsetY;
-
-    document.onmousemove = e => {
-      el.style.left = (e.pageX - offsetX) + "px";
-      el.style.top = (e.pageY - offsetY) + "px";
-    };
-
-    document.onmouseup = () => {
-      document.onmousemove = null;
-    };
-  };
+  let avg = rates.reduce((a, b) => a + b, 0) / rates.length;
+  document.getElementById("rate-title").innerText = avg.toFixed(1) + "%";
 }
