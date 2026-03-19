@@ -81,6 +81,7 @@ function addLine() {
     initTodo();
 }
 
+
 function save() {
     localStorage.setItem("data", JSON.stringify(data));
 }
@@ -150,4 +151,12 @@ function renderChart() {
             datasets: [{ data: rates }]
         }
     });
+}
+
+function save() {
+    localStorage.setItem("data", JSON.stringify(data));
+
+    // 新增：保存后同步刷新其他页面
+    renderPast();
+    renderChart();
 }
