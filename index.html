@@ -14,38 +14,36 @@
     <div class="main-title">Today</div>
 
     <div class="menu">
-        <button onclick="show('todo')">CREATE TODAY'S TODO LIST</button>
-        <button onclick="show('past')">VIEW PAST LIST</button>
-        <button onclick="show('record')">SELF RECORDING</button>
+        <button class="btn" onclick="show('todo')">CREATE TODAY'S TODO LIST</button>
+        <button class="btn" onclick="show('past')">VIEW PAST LIST</button>
+        <button class="btn" onclick="show('record')">SELF RECORDING</button>
     </div>
 </div>
 
 <!-- TODO -->
 <div id="todo" class="screen">
-    <button class="back" onclick="show('home')">←</button>
-
-    <button class="sticker-btn" onclick="toggleSticker()">+</button>
+    <button class="btn back" onclick="show('home')">← Back</button>
+    <button class="btn sticker-btn" onclick="toggleSticker()">＋</button>
 
     <div id="todo-area"></div>
 
-    <!-- 贴纸 -->
+    <button class="btn save-btn" onclick="save()">Save</button>
+
     <div id="sticker-panel" class="hidden"></div>
     <div id="canvas"></div>
 </div>
 
 <!-- Past -->
 <div id="past" class="screen">
-    <button class="back" onclick="show('home')">←</button>
-
+    <button class="btn back" onclick="show('home')">← Back</button>
     <div id="past-content"></div>
 </div>
 
 <!-- Record -->
 <div id="record" class="screen">
-    <button class="back" onclick="show('home')">←</button>
+    <button class="btn back" onclick="show('home')">← Back</button>
 
     <div class="big-rate" id="big-rate">0%</div>
-
     <div class="small-title">Completion Rate</div>
 
     <div class="chart-box">
