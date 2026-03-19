@@ -10,7 +10,9 @@
     <div class="container">
         <!-- 主界面 Today -->
         <div id="main-screen" class="screen active">
-            <h1 class="screen-title">Today</h1>
+            <div class="main-header">
+                <h1 class="screen-title">Today</h1>
+            </div>
             <div class="action-buttons">
                 <button class="btn" onclick="showScreen('todo-screen')">CREATE TODAY'S TODO LIST</button>
                 <button class="btn" onclick="showScreen('past-screen')">VIEW PAST LIST</button>
@@ -20,12 +22,14 @@
 
         <!-- 界面1：今日待办 -->
         <div id="todo-screen" class="screen">
-            <div class="header">
+            <div class="todo-header">
                 <button class="back-btn" onclick="showScreen('main-screen')">← Back</button>
                 <button class="add-sticker-btn" onclick="openStickerPanel()">+</button>
             </div>
-            <div id="todo-items" class="todo-items">
-                <!-- 动态生成待办项 -->
+            <div class="todo-container">
+                <div id="todo-items" class="todo-items">
+                    <!-- 动态生成待办项 -->
+                </div>
             </div>
             <div id="sticker-panel" class="sticker-panel hidden">
                 <div class="sticker-library" id="sticker-library">
