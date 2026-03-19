@@ -1,55 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>TODO Planner</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<title>Daily Todo</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
 <!-- 首页 -->
-<div id="home" class="page active">
-  <div class="main-title">Today</div>
+<div id="home" class="screen active">
+    <div class="main-title">Today</div>
 
-  <div class="menu">
-    <button onclick="showPage('todo')">CREATE A NEW TODO LIST</button>
-    <button onclick="showPage('history')">VIEW PAST LIST</button>
-    <button onclick="showPage('stats')">SELF RECORDING</button>
-  </div>
+    <div class="menu">
+        <button onclick="show('todo')">CREATE TODAY'S TODO LIST</button>
+        <button onclick="show('past')">VIEW PAST LIST</button>
+        <button onclick="show('record')">SELF RECORDING</button>
+    </div>
 </div>
 
-<!-- 页面1：TODO -->
-<div id="todo" class="page">
-  <button class="back" onclick="showPage('home')">← Back</button>
+<!-- TODO -->
+<div id="todo" class="screen">
+    <button class="back" onclick="show('home')">←</button>
 
-  <h2 id="today-date"></h2>
+    <button class="sticker-btn" onclick="toggleSticker()">+</button>
 
-  <div id="todo-list"></div>
+    <div id="todo-area"></div>
 
-  <button onclick="addTodo()">+ Add</button>
-  <button onclick="saveToday()">Save</button>
+    <!-- 贴纸 -->
+    <div id="sticker-panel" class="hidden"></div>
+    <div id="canvas"></div>
 </div>
 
-<!-- 页面2：历史 -->
-<div id="history" class="page">
-  <button class="back" onclick="showPage('home')">← Back</button>
+<!-- Past -->
+<div id="past" class="screen">
+    <button class="back" onclick="show('home')">←</button>
 
-  <h2>Past List</h2>
-  <div id="history-list"></div>
+    <div id="past-content"></div>
 </div>
 
-<!-- 页面3：统计 -->
-<div id="stats" class="page">
-  <button class="back" onclick="showPage('home')">← Back</button>
+<!-- Record -->
+<div id="record" class="screen">
+    <button class="back" onclick="show('home')">←</button>
 
-  <h2 id="rate-title"></h2>
-  <img id="rate-emoji" width="60">
+    <div class="big-rate" id="big-rate">0%</div>
 
-  <div class="chart-container">
-    <canvas id="chart"></canvas>
-    <div id="no-data">暂无数据</div>
-  </div>
+    <div class="small-title">Completion Rate</div>
+
+    <div class="chart-box">
+        <canvas id="chart"></canvas>
+        <div id="no-data">暂无数据</div>
+    </div>
 </div>
 
 <script src="app.js"></script>
