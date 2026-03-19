@@ -10,45 +10,46 @@
 
 <!-- 首页 -->
 <div id="home" class="page active">
-  <h1>DAILY PLANNER</h1>
-  <button onclick="showPage('todo')">CREATE TODAY'S TODO LIST</button>
-  <button onclick="showPage('history')">VIEW PAST LIST</button>
-  <button onclick="showPage('stats')">SELF RECORDING</button>
+  <div class="main-title">Today</div>
+
+  <div class="menu">
+    <button onclick="showPage('todo')">CREATE A NEW TODO LIST</button>
+    <button onclick="showPage('history')">VIEW PAST LIST</button>
+    <button onclick="showPage('stats')">SELF RECORDING</button>
+  </div>
 </div>
 
-<!-- TODO页面 -->
+<!-- 页面1：TODO -->
 <div id="todo" class="page">
-  <div class="top-bar">
-    <h2 id="today-title"></h2>
-    <button onclick="openStickerPanel()">＋</button>
-  </div>
+  <button class="back" onclick="showPage('home')">← Back</button>
+
+  <h2 id="today-date"></h2>
 
   <div id="todo-list"></div>
 
-  <!-- 贴纸层 -->
-  <div id="sticker-layer"></div>
-
-  <!-- 贴纸面板 -->
-  <div id="sticker-panel" class="hidden"></div>
-
   <button onclick="addTodo()">+ Add</button>
   <button onclick="saveToday()">Save</button>
-  <button onclick="showPage('home')">Back</button>
 </div>
 
-<!-- 历史 -->
+<!-- 页面2：历史 -->
 <div id="history" class="page">
-  <h2>Past Lists</h2>
+  <button class="back" onclick="showPage('home')">← Back</button>
+
+  <h2>Past List</h2>
   <div id="history-list"></div>
-  <button onclick="showPage('home')">Back</button>
 </div>
 
-<!-- 统计 -->
+<!-- 页面3：统计 -->
 <div id="stats" class="page">
+  <button class="back" onclick="showPage('home')">← Back</button>
+
   <h2 id="rate-title"></h2>
-  <img id="rate-emoji" width="50">
-  <canvas id="chart"></canvas>
-  <button onclick="showPage('home')">Back</button>
+  <img id="rate-emoji" width="60">
+
+  <div class="chart-container">
+    <canvas id="chart"></canvas>
+    <div id="no-data">暂无数据</div>
+  </div>
 </div>
 
 <script src="app.js"></script>
